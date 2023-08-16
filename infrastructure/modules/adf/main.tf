@@ -1,5 +1,5 @@
 resource "azurerm_data_factory" "adf" {
-  name                            = "df-${var.default_name}"
+  name                            = "adf-${var.default_name}"
   location                        = var.location
   resource_group_name             = var.resource_group_name
   public_network_enabled          = false
@@ -38,9 +38,16 @@ resource "azurerm_data_factory" "adf" {
   }
 }
 
-resource "azurerm_data_factory_managed_private_endpoint" "adf" {
-  name               = "pe-storage-${var.default_name}"
+resource "azurerm_data_factory_managed_private_endpoint" "adlpvt" {
+  name               = "pe-adlgen2-${var.default_name}"
   data_factory_id    = azurerm_data_factory.adf.id
   target_resource_id = var.storage_account_id
-  subresource_name = "blob"
+  subresource_name = "dfs"
+}
+
+resource "azurerm_data_factory_managed_private_endpoint" "tablepvt" {
+  name               = "pe-tablestorage-${var.default_name}"
+  data_factory_id    = azurerm_data_factory.adf.id
+  target_resource_id = var.storage_account_id
+  subresource_name = "table"
 }

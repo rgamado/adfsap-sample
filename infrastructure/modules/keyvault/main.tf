@@ -16,7 +16,7 @@ resource "azurerm_key_vault" "kv" {
   sku_name                        = "standard"
   soft_delete_retention_days      = 30
   tenant_id                       = data.azurerm_client_config.current.tenant_id
-  public_network_access_enabled   = false
+  # public_network_access_enabled   = false
 
   network_acls {
     bypass                     = "AzureServices"

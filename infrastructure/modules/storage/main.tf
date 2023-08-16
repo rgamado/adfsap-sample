@@ -8,8 +8,8 @@ resource "azurerm_storage_account" "datalake" {
   tags                              = var.tags
   is_hns_enabled                    = var.is_hns_enabled
   enable_https_traffic_only         = true
-  public_network_access_enabled     = false
-  allow_nested_items_to_be_public   = false
+  # public_network_access_enabled     = false
+  # allow_nested_items_to_be_public   = false
   infrastructure_encryption_enabled = var.infrastructure_encryption_enabled
 
   network_rules {
@@ -51,15 +51,15 @@ resource "azurerm_storage_table" "watermark" {
 }
 
 resource "azurerm_private_endpoint" "datalake" {
-  name                = "pe-storage-${var.default_name}"
+  name                = "pe-datalake-${var.default_name}"
   location            = var.location
   resource_group_name = var.resource_group_name
   subnet_id           = var.private_endpoint_subnet_storage_id
 
   private_service_connection {
-    name                           = "psc-storage-${var.default_name}"
+    name                           = "psc-datalake-${var.default_name}"
     is_manual_connection           = false
     private_connection_resource_id = azurerm_storage_account.datalake.id
-    subresource_names              = ["blob"]
+    subresource_names              = ["dfs", "blob"]
   }
 }
