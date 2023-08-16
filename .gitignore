@@ -1,0 +1,6 @@
+**/.terraform
+tf.plan
+**/*.env
+**/.terraform.lock.hcl
+**/*.ftvars
+.vscode
