@@ -1,0 +1,12 @@
+{
+	"name": "DS_ODATA_SAP",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ODATA_SAP",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "ODataResource",
+		"schema": []
+	}
+}
