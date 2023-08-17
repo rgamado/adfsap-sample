@@ -1,0 +1,11 @@
+{
+	"name": "LS_AKV_RAMADOANALYTICS",
+	"properties": {
+		"description": "Conexão com key vault KV-RAMADOANALYTICS",
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://kv-ramadoanalytics.vault.azure.net/"
+		}
+	}
+}
