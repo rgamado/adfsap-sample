@@ -2,5 +2,5 @@
 tf.plan
 **/*.env
 **/.terraform.lock.hcl
-**/*.ftvars
+**/*.tfvars
 .vscode
