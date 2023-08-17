@@ -1,0 +1,35 @@
+{
+	"name": "OData1",
+	"properties": {
+		"parameters": {
+			"SAP_GW_USER": {
+				"type": "String"
+			},
+			"SAP_GW_HOST": {
+				"type": "String"
+			},
+			"SAP_ODATA_SRV": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "OData",
+		"typeProperties": {
+			"url": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV)}",
+			"authenticationType": "Basic",
+			"userName": "@{linkedService().SAP_GW_USER}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_AKV_RAMADOANALYTICS",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "SAP-GATEWAY-PWD"
+			}
+		},
+		"connectVia": {
+			"referenceName": "AzServicesIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
