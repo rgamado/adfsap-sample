@@ -1,0 +1,114 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "df-ramadoanalytics"
+		},
+		"pe-adlgen2-ramadoanalytics_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.Storage/storageAccounts/ramadoanalyticsdata"
+		},
+		"pe-adlgen2-ramadoanalytics_properties_groupId": {
+			"type": "string",
+			"defaultValue": "dfs"
+		},
+		"pe-adlgen2-ramadoanalytics_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"ramadoanalyticsdata.dfs.core.windows.net"
+			]
+		},
+		"pe-storage-ramadoanalytics_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.Storage/storageAccounts/ramadoanalyticsdata"
+		},
+		"pe-storage-ramadoanalytics_properties_groupId": {
+			"type": "string",
+			"defaultValue": "blob"
+		},
+		"pe-storage-ramadoanalytics_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"ramadoanalyticsdata.blob.core.windows.net"
+			]
+		},
+		"pe-tablestorage-ramadoanalytics_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.Storage/storageAccounts/ramadoanalyticsdata"
+		},
+		"pe-tablestorage-ramadoanalytics_properties_groupId": {
+			"type": "string",
+			"defaultValue": "table"
+		},
+		"pe-tablestorage-ramadoanalytics_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"ramadoanalyticsdata.table.core.windows.net"
+			]
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/default')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
+			"apiVersion": "2018-06-01",
+			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PrivateIntegrationRuntime')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/pe-adlgen2-ramadoanalytics')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('pe-adlgen2-ramadoanalytics_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('pe-adlgen2-ramadoanalytics_properties_groupId')]",
+				"fqdns": "[parameters('pe-adlgen2-ramadoanalytics_properties_fqdns')]"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/pe-storage-ramadoanalytics')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('pe-storage-ramadoanalytics_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('pe-storage-ramadoanalytics_properties_groupId')]",
+				"fqdns": "[parameters('pe-storage-ramadoanalytics_properties_fqdns')]"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/pe-tablestorage-ramadoanalytics')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('pe-tablestorage-ramadoanalytics_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('pe-tablestorage-ramadoanalytics_properties_groupId')]",
+				"fqdns": "[parameters('pe-tablestorage-ramadoanalytics_properties_fqdns')]"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		}
+	]
+}

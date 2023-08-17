@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "df-ramadoanalytics"
+		},
+		"pe-adlgen2-ramadoanalytics_properties_privateLinkResourceId": {
+			"value": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.Storage/storageAccounts/ramadoanalyticsdata"
+		},
+		"pe-adlgen2-ramadoanalytics_properties_groupId": {
+			"value": "dfs"
+		},
+		"pe-adlgen2-ramadoanalytics_properties_fqdns": {
+			"value": [
+				"ramadoanalyticsdata.dfs.core.windows.net"
+			]
+		},
+		"pe-storage-ramadoanalytics_properties_privateLinkResourceId": {
+			"value": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.Storage/storageAccounts/ramadoanalyticsdata"
+		},
+		"pe-storage-ramadoanalytics_properties_groupId": {
+			"value": "blob"
+		},
+		"pe-storage-ramadoanalytics_properties_fqdns": {
+			"value": [
+				"ramadoanalyticsdata.blob.core.windows.net"
+			]
+		},
+		"pe-tablestorage-ramadoanalytics_properties_privateLinkResourceId": {
+			"value": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.Storage/storageAccounts/ramadoanalyticsdata"
+		},
+		"pe-tablestorage-ramadoanalytics_properties_groupId": {
+			"value": "table"
+		},
+		"pe-tablestorage-ramadoanalytics_properties_fqdns": {
+			"value": [
+				"ramadoanalyticsdata.table.core.windows.net"
+			]
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

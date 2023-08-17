@@ -1,0 +1,111 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "df-ramadoanalytics"
+		},
+		"pe-adlgen2-ramadoanalytics_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.Storage/storageAccounts/ramadoanalyticsdata"
+		},
+		"pe-adlgen2-ramadoanalytics_properties_groupId": {
+			"type": "string",
+			"defaultValue": "dfs"
+		},
+		"pe-adlgen2-ramadoanalytics_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"ramadoanalyticsdata.dfs.core.windows.net"
+			]
+		},
+		"pe-storage-ramadoanalytics_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.Storage/storageAccounts/ramadoanalyticsdata"
+		},
+		"pe-storage-ramadoanalytics_properties_groupId": {
+			"type": "string",
+			"defaultValue": "blob"
+		},
+		"pe-storage-ramadoanalytics_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"ramadoanalyticsdata.blob.core.windows.net"
+			]
+		},
+		"pe-tablestorage-ramadoanalytics_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.Storage/storageAccounts/ramadoanalyticsdata"
+		},
+		"pe-tablestorage-ramadoanalytics_properties_groupId": {
+			"type": "string",
+			"defaultValue": "table"
+		},
+		"pe-tablestorage-ramadoanalytics_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"ramadoanalyticsdata.table.core.windows.net"
+			]
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "df-ramadoanalytics_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"pe-adlgen2-ramadoanalytics_properties_privateLinkResourceId": {
+						"value": "[parameters('pe-adlgen2-ramadoanalytics_properties_privateLinkResourceId')]"
+					},
+					"pe-adlgen2-ramadoanalytics_properties_groupId": {
+						"value": "[parameters('pe-adlgen2-ramadoanalytics_properties_groupId')]"
+					},
+					"pe-adlgen2-ramadoanalytics_properties_fqdns": {
+						"value": "[parameters('pe-adlgen2-ramadoanalytics_properties_fqdns')]"
+					},
+					"pe-storage-ramadoanalytics_properties_privateLinkResourceId": {
+						"value": "[parameters('pe-storage-ramadoanalytics_properties_privateLinkResourceId')]"
+					},
+					"pe-storage-ramadoanalytics_properties_groupId": {
+						"value": "[parameters('pe-storage-ramadoanalytics_properties_groupId')]"
+					},
+					"pe-storage-ramadoanalytics_properties_fqdns": {
+						"value": "[parameters('pe-storage-ramadoanalytics_properties_fqdns')]"
+					},
+					"pe-tablestorage-ramadoanalytics_properties_privateLinkResourceId": {
+						"value": "[parameters('pe-tablestorage-ramadoanalytics_properties_privateLinkResourceId')]"
+					},
+					"pe-tablestorage-ramadoanalytics_properties_groupId": {
+						"value": "[parameters('pe-tablestorage-ramadoanalytics_properties_groupId')]"
+					},
+					"pe-tablestorage-ramadoanalytics_properties_fqdns": {
+						"value": "[parameters('pe-tablestorage-ramadoanalytics_properties_fqdns')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
