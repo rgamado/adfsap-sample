@@ -1,0 +1,52 @@
+{
+	"name": "PL_COPY_ODATA_METADATA",
+	"properties": {
+		"activities": [
+			{
+				"name": "l_metadata",
+				"description": "Lista todas as CDS Views e os parâmetros de processamento.",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:05:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "DS_ATBL_WATERMARK",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "fe_metadata",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "l_metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('l_metadata').output.value",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}
