@@ -5,7 +5,11 @@
 		"annotations": [],
 		"type": "AzureKeyVault",
 		"typeProperties": {
-			"baseUrl": "https://kv-ramadoanalytics.vault.azure.net/"
+			"baseUrl": "https://kv-ramadoanalytics.vault.azure.net/",
+			"credential": {
+				"referenceName": "uai-ramadoanalytics-credential",
+				"type": "CredentialReference"
+			}
 		}
 	}
 }
