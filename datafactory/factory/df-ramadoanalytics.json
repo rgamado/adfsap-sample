@@ -1,0 +1,23 @@
+{
+	"name": "df-ramadoanalytics",
+	"properties": {
+		"encryption": {
+			"identity": {
+				"userAssignedIdentity": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.ManagedIdentity/userAssignedIdentities/uai-ramadoanalytics"
+			},
+			"keyName": "ramadoanalytics-adf-cmk",
+			"keyVersion": "9c0f7eb2d7364a17bf4862058f1651ef",
+			"vaultBaseUrl": "https://kv-ramadoanalytics.vault.azure.net/"
+		}
+	},
+	"location": "brazilsouth",
+	"identity": {
+		"type": "UserAssigned",
+		"userAssignedIdentities": {
+			"/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourcegroups/RAMADO-ADF/providers/Microsoft.ManagedIdentity/userAssignedIdentities/uai-ramadoanalytics": {
+				"clientId": "f37c4ff6-d97a-4b0e-a075-bfaf2e194d4c",
+				"principalId": "8cb3d629-6386-449c-a4b6-e1c8b0b07ada"
+			}
+		}
+	}
+}
