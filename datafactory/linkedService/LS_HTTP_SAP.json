@@ -15,7 +15,7 @@
 		"annotations": [],
 		"type": "HttpServer",
 		"typeProperties": {
-			"url": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV)}",
+			"url": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV, '/')}",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Basic",
 			"userName": "@{linkedService().SAP_GW_USER}",
