@@ -65,6 +65,14 @@
 			"type": "string",
 			"defaultValue": "https://ramadoanalyticsdata.dfs.core.windows.net/"
 		},
+		"LS_HTTP_SAP_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV)}"
+		},
+		"LS_HTTP_SAP_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().SAP_GW_USER}"
+		},
 		"LS_ODATA_SAP_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV)}"
@@ -230,6 +238,48 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_HTTP_SAP')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"SAP_GW_HOST": {
+						"type": "String"
+					},
+					"SAP_ODATA_SRV": {
+						"type": "String"
+					},
+					"SAP_GW_USER": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('LS_HTTP_SAP_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Basic",
+					"userName": "[parameters('LS_HTTP_SAP_properties_typeProperties_userName')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "LS_AKV_RAMADOANALYTICS",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "SAP-GATEWAY-PWD"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AzServicesIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzServicesIntegrationRuntime')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_AKV_RAMADOANALYTICS')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_ODATA_SAP')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -331,6 +381,64 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_HTTP_SAP_ENTITY_TOTAL_RECORD')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_HTTP_SAP",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"SAP_GW_HOST": {
+							"value": "@dataset().SAP_GW_HOST",
+							"type": "Expression"
+						},
+						"SAP_ODATA_SRV": {
+							"value": "@dataset().SAP_ODATA_SRV",
+							"type": "Expression"
+						},
+						"SAP_GW_USER": {
+							"value": "@dataset().SAP_GW_USER",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"SAP_GW_HOST": {
+						"type": "string"
+					},
+					"SAP_GW_USER": {
+						"type": "string"
+					},
+					"SAP_ODATA_SRV": {
+						"type": "string"
+					},
+					"SAP_ENTITY": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@concat(dataset().SAP_ENTITY, '/$count')",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": false,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_HTTP_SAP')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_ODATA_SAP')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -396,8 +504,8 @@
 							"timeout": "0.00:02:00",
 							"retry": 0,
 							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
+							"secureOutput": true,
+							"secureInput": true
 						},
 						"userProperties": [],
 						"typeProperties": {
@@ -499,11 +607,17 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "ODataSource",
-								"httpRequestTimeout": "00:05:00"
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
 							},
 							"dataset": {
-								"referenceName": "DS_ODATA_SAP",
+								"referenceName": "DS_HTTP_SAP_ENTITY_TOTAL_RECORD",
 								"type": "DatasetReference",
 								"parameters": {
 									"SAP_GW_HOST": {
@@ -519,7 +633,7 @@
 										"type": "Expression"
 									},
 									"SAP_ENTITY": {
-										"value": "@{concat(pipeline().parameters.SAP_ENTITY_NAME, '/$count')}",
+										"value": "@pipeline().parameters.SAP_ENTITY_NAME",
 										"type": "Expression"
 									}
 								}
@@ -540,7 +654,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@range(0, add(div(int(activity('l_count').output.firstRow), int(pipeline().parameters.BATCHSIZE)),1))",
+								"value": "@range(0, add(div(int(activity('l_count').output.firstRow.Prop_0), int(pipeline().parameters.BATCHSIZE)),1))",
 								"type": "Expression"
 							},
 							"activities": [
@@ -655,8 +769,9 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/AzServicesIntegrationRuntime')]",
-				"[concat(variables('factoryId'), '/datasets/DS_ODATA_SAP')]",
+				"[concat(variables('factoryId'), '/datasets/DS_HTTP_SAP_ENTITY_TOTAL_RECORD')]",
 				"[concat(variables('factoryId'), '/credentials/uai-ramadoanalytics-credential')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ODATA_SAP')]",
 				"[concat(variables('factoryId'), '/datasets/DS_ADLS_RAW_SAP')]"
 			]
 		},
