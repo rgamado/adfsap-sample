@@ -83,7 +83,7 @@
 				]
 			},
 			{
-				"name": "w_get_odata_oauth_key",
+				"name": "w_get_odata_auth_key",
 				"type": "WebActivity",
 				"dependsOn": [],
 				"policy": {
@@ -119,7 +119,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "w_get_odata_oauth_key",
+						"activity": "w_get_odata_auth_key",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -133,7 +133,7 @@
 				"typeProperties": {
 					"variableName": "ODATA_URL",
 					"value": {
-						"value": "@activity('w_get_odata_oauth_key').output.firstRow.host",
+						"value": "@activity('w_get_odata_auth_key').output.firstRow.host",
 						"type": "Expression"
 					}
 				}
@@ -143,7 +143,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "w_get_odata_oauth_key",
+						"activity": "w_get_odata_auth_key",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -157,7 +157,7 @@
 				"typeProperties": {
 					"variableName": "ODATA_USR",
 					"value": {
-						"value": "@activity('w_get_odata_oauth_key').output.firstRow.user",
+						"value": "@activity('w_get_odata_auth_key').output.firstRow.user",
 						"type": "Expression"
 					}
 				}
