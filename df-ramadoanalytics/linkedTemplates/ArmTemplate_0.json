@@ -654,7 +654,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@range(0, add(div(int(activity('l_count').output.firstRow.Prop_0), int(pipeline().parameters.BATCHSIZE)),1))",
+								"value": "@range(0, add(div(int(activity('l_count').output.firstRow.Prop_0), pipeline().parameters.BATCHSIZE),1))",
 								"type": "Expression"
 							},
 							"activities": [
