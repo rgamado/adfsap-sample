@@ -113,11 +113,17 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "ODataSource",
-						"httpRequestTimeout": "00:05:00"
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
 					},
 					"dataset": {
-						"referenceName": "DS_ODATA_SAP",
+						"referenceName": "DS_HTTP_SAP_ENTITY_TOTAL_RECORD",
 						"type": "DatasetReference",
 						"parameters": {
 							"SAP_GW_HOST": {
@@ -133,7 +139,7 @@
 								"type": "Expression"
 							},
 							"SAP_ENTITY": {
-								"value": "@{concat(pipeline().parameters.SAP_ENTITY_NAME, '/$count')}",
+								"value": "@pipeline().parameters.SAP_ENTITY_NAME",
 								"type": "Expression"
 							}
 						}
@@ -154,7 +160,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@range(0, add(div(int(activity('l_count').output.firstRow), int(pipeline().parameters.BATCHSIZE)),1))",
+						"value": "@range(0, add(div(int(activity('l_count').output.firstRow.Prop_0), int(pipeline().parameters.BATCHSIZE)),1))",
 						"type": "Expression"
 					},
 					"activities": [
