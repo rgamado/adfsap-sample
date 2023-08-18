@@ -5,6 +5,24 @@
 		"factoryName": {
 			"value": "df-ramadoanalytics"
 		},
+		"LS_ADLS_RAMADOANALYTICSDATA_accountKey": {
+			"value": ""
+		},
+		"LS_ATBL_RAMADOANALYTICSDATA_connectionString": {
+			"value": ""
+		},
+		"LS_ADLS_RAMADOANALYTICSDATA_properties_typeProperties_url": {
+			"value": "https://ramadoanalyticsdata.dfs.core.windows.net/"
+		},
+		"LS_AKV_RAMADOANALYTICS_properties_typeProperties_baseUrl": {
+			"value": "https://kv-ramadoanalytics.vault.azure.net/"
+		},
+		"LS_ODATA_SAP_properties_typeProperties_url": {
+			"value": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV)}"
+		},
+		"LS_ODATA_SAP_properties_typeProperties_userName": {
+			"value": "@{linkedService().SAP_GW_USER}"
+		},
 		"pe-adlgen2-ramadoanalytics_properties_privateLinkResourceId": {
 			"value": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.Storage/storageAccounts/ramadoanalyticsdata"
 		},

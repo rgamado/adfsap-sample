@@ -7,6 +7,30 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "df-ramadoanalytics"
 		},
+		"LS_ADLS_RAMADOANALYTICSDATA_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_RAMADOANALYTICSDATA'"
+		},
+		"LS_ATBL_RAMADOANALYTICSDATA_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_ATBL_RAMADOANALYTICSDATA'"
+		},
+		"LS_ADLS_RAMADOANALYTICSDATA_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ramadoanalyticsdata.dfs.core.windows.net/"
+		},
+		"LS_AKV_RAMADOANALYTICS_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-ramadoanalytics.vault.azure.net/"
+		},
+		"LS_ODATA_SAP_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV)}"
+		},
+		"LS_ODATA_SAP_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().SAP_GW_USER}"
+		},
 		"pe-adlgen2-ramadoanalytics_properties_privateLinkResourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/9e79b470-ec7a-4a74-a8a2-09647bbd3470/resourceGroups/RAMADO-ADF/providers/Microsoft.Storage/storageAccounts/ramadoanalyticsdata"
@@ -76,6 +100,15 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"LS_ADLS_RAMADOANALYTICSDATA_accountKey": {
+						"value": "[parameters('LS_ADLS_RAMADOANALYTICSDATA_accountKey')]"
+					},
+					"LS_ATBL_RAMADOANALYTICSDATA_connectionString": {
+						"value": "[parameters('LS_ATBL_RAMADOANALYTICSDATA_connectionString')]"
+					},
+					"LS_AKV_RAMADOANALYTICS_properties_typeProperties_baseUrl": {
+						"value": "[parameters('LS_AKV_RAMADOANALYTICS_properties_typeProperties_baseUrl')]"
+					},
 					"pe-adlgen2-ramadoanalytics_properties_privateLinkResourceId": {
 						"value": "[parameters('pe-adlgen2-ramadoanalytics_properties_privateLinkResourceId')]"
 					},
@@ -102,6 +135,15 @@
 					},
 					"pe-tablestorage-ramadoanalytics_properties_fqdns": {
 						"value": "[parameters('pe-tablestorage-ramadoanalytics_properties_fqdns')]"
+					},
+					"LS_ADLS_RAMADOANALYTICSDATA_properties_typeProperties_url": {
+						"value": "[parameters('LS_ADLS_RAMADOANALYTICSDATA_properties_typeProperties_url')]"
+					},
+					"LS_ODATA_SAP_properties_typeProperties_url": {
+						"value": "[parameters('LS_ODATA_SAP_properties_typeProperties_url')]"
+					},
+					"LS_ODATA_SAP_properties_typeProperties_userName": {
+						"value": "[parameters('LS_ODATA_SAP_properties_typeProperties_userName')]"
 					}
 				}
 			},
