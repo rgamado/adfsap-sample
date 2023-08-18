@@ -441,7 +441,7 @@
 						"typeProperties": {
 							"variableName": "ODATA_HOST",
 							"value": {
-								"value": "@activity('w_get_odata_auth_key').output.host",
+								"value": "@json(activity('w_get_odata_auth_key').output.value).host",
 								"type": "Expression"
 							}
 						}
@@ -466,7 +466,7 @@
 						"typeProperties": {
 							"variableName": "ODATA_USER",
 							"value": {
-								"value": "@activity('w_get_odata_auth_key').output.user",
+								"value": "@json(activity('w_get_odata_auth_key').output.value).user",
 								"type": "Expression"
 							}
 						}
@@ -709,7 +709,6 @@
 								"value": "@activity('l_metadata').output.value",
 								"type": "Expression"
 							},
-							"isSequential": false,
 							"activities": [
 								{
 									"name": "ep_sap_ingestion",
