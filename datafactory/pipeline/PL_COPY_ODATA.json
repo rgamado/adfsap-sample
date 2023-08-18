@@ -180,7 +180,7 @@
 								"source": {
 									"type": "ODataSource",
 									"query": {
-										"value": "@concat('$top=',pipeline().parameters.BATCHSIZE, '&$skip=',string(mul(int(item().value), int(pipeline().parameters.BATCHSIZE))))",
+										"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item().value), pipeline().parameters.BATCHSIZE)))",
 										"type": "Expression"
 									},
 									"httpRequestTimeout": "00:05:00"
@@ -256,7 +256,7 @@
 				"type": "string"
 			},
 			"BATCHSIZE": {
-				"type": "string"
+				"type": "int"
 			}
 		},
 		"variables": {
