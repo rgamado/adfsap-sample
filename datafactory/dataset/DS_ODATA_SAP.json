@@ -3,10 +3,44 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_ODATA_SAP",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"SAP_GW_HOST": {
+					"value": "@dataset().SAP_GW_HOST",
+					"type": "Expression"
+				},
+				"SAP_ODATA_SRV": {
+					"value": "@dataset().SAP_ODATA_SRV",
+					"type": "Expression"
+				},
+				"SAP_GW_USER": {
+					"value": "@dataset().SAP_GW_USER",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"SAP_GW_HOST": {
+				"type": "string"
+			},
+			"SAP_GW_USER": {
+				"type": "string"
+			},
+			"SAP_ODATA_SRV": {
+				"type": "string"
+			},
+			"SAP_ENTITY": {
+				"type": "string"
+			}
 		},
 		"annotations": [],
 		"type": "ODataResource",
-		"schema": []
+		"schema": [],
+		"typeProperties": {
+			"path": {
+				"value": "@dataset().SAP_ENTITY",
+				"type": "Expression"
+			}
+		}
 	}
 }

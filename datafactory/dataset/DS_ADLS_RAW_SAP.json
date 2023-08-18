@@ -9,9 +9,6 @@
 			"PATH_TO_ENTITY": {
 				"type": "string"
 			},
-			"ENTITY_NAME": {
-				"type": "string"
-			},
 			"COMPRESS_TYPE": {
 				"type": "string",
 				"defaultValue": "snappy"
@@ -22,10 +19,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "@dataset().ENTITY_NAME",
-					"type": "Expression"
-				},
 				"folderPath": {
 					"value": "@dataset().PATH_TO_ENTITY",
 					"type": "Expression"
