@@ -43,7 +43,48 @@
 					"items": {
 						"value": "@activity('l_metadata').output.value",
 						"type": "Expression"
-					}
+					},
+					"activities": [
+						{
+							"name": "ep_sap_ingestion",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_COPY_ODATA",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"SAP_ODATA_AUTH_KEY": {
+										"value": "@item().ODataServiceAuthKey",
+										"type": "Expression"
+									},
+									"SAP_ODATA_SRV": {
+										"value": "@item().PartitionKey",
+										"type": "Expression"
+									},
+									"SAP_ENTITY_NAME": {
+										"value": "@item().RowKey",
+										"type": "Expression"
+									},
+									"OUTPUT_PATH": {
+										"value": "@item().OutputPath",
+										"type": "Expression"
+									},
+									"SAP_ODATA_FILTERS": {
+										"value": "@item().Filter",
+										"type": "Expression"
+									},
+									"BATCHSIZE": {
+										"value": "@item().BatchSize",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
 				}
 			}
 		],
