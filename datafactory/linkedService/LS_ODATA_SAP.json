@@ -15,7 +15,7 @@
 		"annotations": [],
 		"type": "OData",
 		"typeProperties": {
-			"url": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV)}",
+			"url": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV, '/')}",
 			"authenticationType": "Basic",
 			"userName": "@{linkedService().SAP_GW_USER}",
 			"password": {
