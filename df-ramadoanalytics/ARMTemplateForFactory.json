@@ -25,7 +25,7 @@
 		},
 		"LS_HTTP_SAP_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV)}"
+			"defaultValue": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV, '/')}"
 		},
 		"LS_HTTP_SAP_properties_typeProperties_userName": {
 			"type": "string",
@@ -33,7 +33,7 @@
 		},
 		"LS_ODATA_SAP_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV)}"
+			"defaultValue": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV, '/')}"
 		},
 		"LS_ODATA_SAP_properties_typeProperties_userName": {
 			"type": "string",

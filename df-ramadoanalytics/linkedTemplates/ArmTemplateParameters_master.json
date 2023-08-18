@@ -18,13 +18,13 @@
 			"value": "https://kv-ramadoanalytics.vault.azure.net/"
 		},
 		"LS_HTTP_SAP_properties_typeProperties_url": {
-			"value": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV)}"
+			"value": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV, '/')}"
 		},
 		"LS_HTTP_SAP_properties_typeProperties_userName": {
 			"value": "@{linkedService().SAP_GW_USER}"
 		},
 		"LS_ODATA_SAP_properties_typeProperties_url": {
-			"value": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV)}"
+			"value": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV, '/')}"
 		},
 		"LS_ODATA_SAP_properties_typeProperties_userName": {
 			"value": "@{linkedService().SAP_GW_USER}"
