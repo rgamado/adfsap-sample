@@ -138,7 +138,7 @@
 						"typeProperties": {
 							"variableName": "ODATA_HOST",
 							"value": {
-								"value": "@activity('w_get_odata_auth_key').output.firstRow.host",
+								"value": "@activity('w_get_odata_auth_key').output.host",
 								"type": "Expression"
 							}
 						}
@@ -163,7 +163,7 @@
 						"typeProperties": {
 							"variableName": "ODATA_USER",
 							"value": {
-								"value": "@activity('w_get_odata_auth_key').output.firstRow.user",
+								"value": "@activity('w_get_odata_auth_key').output.user",
 								"type": "Expression"
 							}
 						}
