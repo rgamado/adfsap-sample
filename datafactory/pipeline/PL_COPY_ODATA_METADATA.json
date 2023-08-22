@@ -44,6 +44,7 @@
 						"value": "@activity('l_metadata').output.value",
 						"type": "Expression"
 					},
+					"isSequential": false,
 					"activities": [
 						{
 							"name": "ep_sap_ingestion",

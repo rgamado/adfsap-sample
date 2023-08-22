@@ -189,13 +189,23 @@
 									"type": "ParquetSink",
 									"storeSettings": {
 										"type": "AzureBlobFSWriteSettings",
-										"copyBehavior": "PreserveHierarchy"
+										"copyBehavior": "MergeFiles"
 									},
 									"formatSettings": {
 										"type": "ParquetWriteSettings"
 									}
 								},
-								"enableStaging": false
+								"enableStaging": true,
+								"stagingSettings": {
+									"linkedServiceName": {
+										"referenceName": "LS_ADLS_RAMADOANALYTICSDATA",
+										"type": "LinkedServiceReference"
+									},
+									"path": {
+										"value": "@{concat('staging/',pipeline().parameters.OUTPUT_PATH, '/', pipeline().parameters.SAP_ENTITY_NAME)}",
+										"type": "Expression"
+									}
+								}
 							},
 							"inputs": [
 								{
