@@ -230,7 +230,11 @@
 											"value": "@{concat(pipeline().parameters.OUTPUT_PATH, '/', pipeline().parameters.SAP_ENTITY_NAME)}",
 											"type": "Expression"
 										},
-										"COMPRESS_TYPE": "snappy"
+										"COMPRESS_TYPE": "snappy",
+										"SAP_ENTITY_NAME": {
+											"value": "@pipeline().parameters.SAP_ENTITY_NAME",
+											"type": "Expression"
+										}
 									}
 								}
 							]
