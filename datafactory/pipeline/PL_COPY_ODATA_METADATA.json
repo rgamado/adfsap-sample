@@ -81,6 +81,14 @@
 									"BATCHSIZE": {
 										"value": "@item().BatchSize",
 										"type": "Expression"
+									},
+									"SELECT": {
+										"value": "@item().Select",
+										"type": "Expression"
+									},
+									"FILTER": {
+										"value": "@item().Filter",
+										"type": "Expression"
 									}
 								}
 							}
