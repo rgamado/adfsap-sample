@@ -336,6 +336,9 @@
 					"COMPRESS_TYPE": {
 						"type": "string",
 						"defaultValue": "snappy"
+					},
+					"SAP_ENTITY_NAME": {
+						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -343,6 +346,10 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@concat(dataset().SAP_ENTITY_NAME, '.parquet')",
+							"type": "Expression"
+						},
 						"folderPath": {
 							"value": "@dataset().PATH_TO_ENTITY",
 							"type": "Expression"
@@ -724,7 +731,11 @@
 													"value": "@{concat(pipeline().parameters.OUTPUT_PATH, '/', pipeline().parameters.SAP_ENTITY_NAME)}",
 													"type": "Expression"
 												},
-												"COMPRESS_TYPE": "snappy"
+												"COMPRESS_TYPE": "snappy",
+												"SAP_ENTITY_NAME": {
+													"value": "@pipeline().parameters.SAP_ENTITY_NAME",
+													"type": "Expression"
+												}
 											}
 										}
 									]
@@ -824,7 +835,6 @@
 								"value": "@activity('l_metadata').output.value",
 								"type": "Expression"
 							},
-							"isSequential": false,
 							"activities": [
 								{
 									"name": "ep_sap_ingestion",
