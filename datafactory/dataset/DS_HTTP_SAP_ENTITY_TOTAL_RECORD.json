@@ -31,6 +31,9 @@
 			},
 			"SAP_ENTITY": {
 				"type": "string"
+			},
+			"QUERY": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
@@ -39,7 +42,7 @@
 			"location": {
 				"type": "HttpServerLocation",
 				"relativeUrl": {
-					"value": "@concat(dataset().SAP_ENTITY, '/$count')",
+					"value": "@concat(dataset().SAP_ENTITY, '/$count', dataset().QUERY)",
 					"type": "Expression"
 				}
 			},

@@ -141,6 +141,10 @@
 							"SAP_ENTITY": {
 								"value": "@pipeline().parameters.SAP_ENTITY_NAME",
 								"type": "Expression"
+							},
+							"QUERY": {
+								"value": "@if(empty(pipeline().parameters.FILTER), '', concat('?$filter=', pipeline().parameters.FILTER)) ",
+								"type": "Expression"
 							}
 						}
 					}
@@ -180,7 +184,7 @@
 								"source": {
 									"type": "ODataSource",
 									"query": {
-										"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item()), pipeline().parameters.BATCHSIZE)))",
+										"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item()), pipeline().parameters.BATCHSIZE)), if(empty(pipeline().parameters.FILTER), '', concat('&$filter=',pipeline().parameters.FILTER)), if(empty(pipeline().parameters.SELECT), '', concat('&$select=',pipeline().parameters.SELECT)))",
 										"type": "Expression"
 									},
 									"httpRequestTimeout": "00:05:00"
@@ -267,6 +271,12 @@
 			},
 			"BATCHSIZE": {
 				"type": "int"
+			},
+			"SELECT": {
+				"type": "string"
+			},
+			"FILTER": {
+				"type": "string"
 			}
 		},
 		"variables": {
