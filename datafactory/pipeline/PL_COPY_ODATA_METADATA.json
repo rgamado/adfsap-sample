@@ -47,50 +47,126 @@
 					"isSequential": false,
 					"activities": [
 						{
-							"name": "ep_sap_ingestion",
-							"type": "ExecutePipeline",
+							"name": "sw_delta",
+							"type": "Switch",
 							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "PL_COPY_ODATA",
-									"type": "PipelineReference"
+								"on": {
+									"value": "@item().ExtractionType",
+									"type": "Expression"
 								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"SAP_ODATA_AUTH_KEY": {
-										"value": "@item().ODataServiceAuthKey",
-										"type": "Expression"
-									},
-									"SAP_ODATA_SRV": {
-										"value": "@item().PartitionKey",
-										"type": "Expression"
-									},
-									"SAP_ENTITY_NAME": {
-										"value": "@item().RowKey",
-										"type": "Expression"
-									},
-									"OUTPUT_PATH": {
-										"value": "@item().OutputPath",
-										"type": "Expression"
-									},
-									"SAP_ODATA_FILTERS": {
-										"value": "@item().Filter",
-										"type": "Expression"
-									},
-									"BATCHSIZE": {
-										"value": "@item().BatchSize",
-										"type": "Expression"
-									},
-									"SELECT": {
-										"value": "@item().Select",
-										"type": "Expression"
-									},
-									"FILTER": {
-										"value": "@item().Filter",
-										"type": "Expression"
+								"cases": [
+									{
+										"value": "Delta",
+										"activities": [
+											{
+												"name": "ep_sap_delta_ingestion_copy",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "PL_COPY_ODATA_DELTA",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"SAP_ODATA_AUTH_KEY": {
+															"value": "@item().ODataServiceAuthKey",
+															"type": "Expression"
+														},
+														"SAP_ODATA_SRV": {
+															"value": "@item().PartitionKey",
+															"type": "Expression"
+														},
+														"SAP_ENTITY_NAME": {
+															"value": "@item().RowKey",
+															"type": "Expression"
+														},
+														"OUTPUT_PATH": {
+															"value": "@item().OutputPath",
+															"type": "Expression"
+														},
+														"SAP_ODATA_FILTERS": {
+															"value": "@item().Filter",
+															"type": "Expression"
+														},
+														"BATCHSIZE": {
+															"value": "@item().BatchSize",
+															"type": "Expression"
+														},
+														"SELECT": {
+															"value": "@item().Select",
+															"type": "Expression"
+														},
+														"FILTER": {
+															"value": "@item().Filter",
+															"type": "Expression"
+														},
+														"WATERMARK": {
+															"value": "@item().Watermark",
+															"type": "Expression"
+														},
+														"WATERMARK_FIELD": {
+															"value": "@item().WatermarkField",
+															"type": "Expression"
+														}
+													}
+												}
+											}
+										]
 									}
-								}
+								],
+								"defaultActivities": [
+									{
+										"name": "ep_sap_ingestion",
+										"type": "ExecutePipeline",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "PL_COPY_ODATA",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"SAP_ODATA_AUTH_KEY": {
+													"value": "@item().ODataServiceAuthKey",
+													"type": "Expression"
+												},
+												"SAP_ODATA_SRV": {
+													"value": "@item().PartitionKey",
+													"type": "Expression"
+												},
+												"SAP_ENTITY_NAME": {
+													"value": "@item().RowKey",
+													"type": "Expression"
+												},
+												"OUTPUT_PATH": {
+													"value": "@item().OutputPath",
+													"type": "Expression"
+												},
+												"SAP_ODATA_FILTERS": {
+													"value": "@item().Filter",
+													"type": "Expression"
+												},
+												"BATCHSIZE": {
+													"value": "@item().BatchSize",
+													"type": "Expression"
+												},
+												"SELECT": {
+													"value": "@item().Select",
+													"type": "Expression"
+												},
+												"FILTER": {
+													"value": "@item().Filter",
+													"type": "Expression"
+												}
+											}
+										}
+									}
+								]
 							}
 						}
 					]
