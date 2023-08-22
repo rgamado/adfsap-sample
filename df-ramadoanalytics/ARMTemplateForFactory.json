@@ -280,13 +280,23 @@
 											"type": "ParquetSink",
 											"storeSettings": {
 												"type": "AzureBlobFSWriteSettings",
-												"copyBehavior": "PreserveHierarchy"
+												"copyBehavior": "MergeFiles"
 											},
 											"formatSettings": {
 												"type": "ParquetWriteSettings"
 											}
 										},
-										"enableStaging": false
+										"enableStaging": true,
+										"stagingSettings": {
+											"linkedServiceName": {
+												"referenceName": "LS_ADLS_RAMADOANALYTICSDATA",
+												"type": "LinkedServiceReference"
+											},
+											"path": {
+												"value": "@{concat('staging/',pipeline().parameters.OUTPUT_PATH, '/', pipeline().parameters.SAP_ENTITY_NAME)}",
+												"type": "Expression"
+											}
+										}
 									},
 									"inputs": [
 										{
@@ -321,11 +331,7 @@
 													"value": "@{concat(pipeline().parameters.OUTPUT_PATH, '/', pipeline().parameters.SAP_ENTITY_NAME)}",
 													"type": "Expression"
 												},
-												"COMPRESS_TYPE": "snappy",
-												"SAP_ENTITY_NAME": {
-													"value": "@pipeline().parameters.SAP_ENTITY_NAME",
-													"type": "Expression"
-												}
+												"COMPRESS_TYPE": "snappy"
 											}
 										}
 									]
@@ -373,7 +379,8 @@
 				"[concat(variables('factoryId'), '/datasets/DS_HTTP_SAP_ENTITY_TOTAL_RECORD')]",
 				"[concat(variables('factoryId'), '/credentials/uai-ramadoanalytics-credential')]",
 				"[concat(variables('factoryId'), '/datasets/DS_ODATA_SAP')]",
-				"[concat(variables('factoryId'), '/datasets/DS_ADLS_RAW_SAP')]"
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_RAW_SAP')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_RAMADOANALYTICSDATA')]"
 			]
 		},
 		{
@@ -425,6 +432,7 @@
 								"value": "@activity('l_metadata').output.value",
 								"type": "Expression"
 							},
+							"isSequential": false,
 							"activities": [
 								{
 									"name": "ep_sap_ingestion",
@@ -496,9 +504,6 @@
 					"COMPRESS_TYPE": {
 						"type": "string",
 						"defaultValue": "snappy"
-					},
-					"SAP_ENTITY_NAME": {
-						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -506,10 +511,6 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": {
-							"value": "@concat(dataset().SAP_ENTITY_NAME, '.parquet')",
-							"type": "Expression"
-						},
 						"folderPath": {
 							"value": "@dataset().PATH_TO_ENTITY",
 							"type": "Expression"
