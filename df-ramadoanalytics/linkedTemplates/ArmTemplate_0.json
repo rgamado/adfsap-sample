@@ -415,6 +415,9 @@
 					},
 					"SAP_ENTITY": {
 						"type": "string"
+					},
+					"QUERY": {
+						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -423,7 +426,7 @@
 					"location": {
 						"type": "HttpServerLocation",
 						"relativeUrl": {
-							"value": "@concat(dataset().SAP_ENTITY, '/$count')",
+							"value": "@concat(dataset().SAP_ENTITY, '/$count', dataset().QUERY)",
 							"type": "Expression"
 						}
 					},
@@ -635,6 +638,10 @@
 									"SAP_ENTITY": {
 										"value": "@pipeline().parameters.SAP_ENTITY_NAME",
 										"type": "Expression"
+									},
+									"QUERY": {
+										"value": "@if(empty(pipeline().parameters.FILTER), '', concat('?$filter=', pipeline().parameters.FILTER)) ",
+										"type": "Expression"
 									}
 								}
 							}
@@ -674,7 +681,7 @@
 										"source": {
 											"type": "ODataSource",
 											"query": {
-												"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item()), pipeline().parameters.BATCHSIZE)))",
+												"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item()), pipeline().parameters.BATCHSIZE)), if(empty(pipeline().parameters.FILTER), '', concat('&$filter=',pipeline().parameters.FILTER)), if(empty(pipeline().parameters.SELECT), '', concat('&$select=',pipeline().parameters.SELECT)))",
 												"type": "Expression"
 											},
 											"httpRequestTimeout": "00:05:00"
@@ -765,6 +772,325 @@
 					},
 					"BATCHSIZE": {
 						"type": "int"
+					},
+					"SELECT": {
+						"type": "string"
+					},
+					"FILTER": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"ODATA_HOST": {
+						"type": "String"
+					},
+					"ODATA_USER": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AzServicesIntegrationRuntime')]",
+				"[concat(variables('factoryId'), '/datasets/DS_HTTP_SAP_ENTITY_TOTAL_RECORD')]",
+				"[concat(variables('factoryId'), '/credentials/uai-ramadoanalytics-credential')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ODATA_SAP')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_RAW_SAP')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_RAMADOANALYTICSDATA')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_COPY_ODATA_DELTA')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "w_get_odata_auth_key",
+						"description": "Obtém os parâmetros para autenticação no SAP Gateway.",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:02:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@{concat('https://kv-ramadoanalytics.vault.azure.net/secrets/', pipeline().parameters.SAP_ODATA_AUTH_KEY, '?api-version=7.0')}",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AzServicesIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"method": "GET",
+							"headers": {},
+							"authentication": {
+								"resource": "https://vault.azure.net",
+								"credential": {
+									"referenceName": "uai-ramadoanalytics-credential",
+									"type": "CredentialReference"
+								},
+								"type": "UserAssignedManagedIdentity"
+							}
+						}
+					},
+					{
+						"name": "set_ver_odata_host",
+						"description": "Adiciona o host do SAP Gateway a variável",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "w_get_odata_auth_key",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "ODATA_HOST",
+							"value": {
+								"value": "@json(activity('w_get_odata_auth_key').output.value).host",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "set_var_odata_user",
+						"description": "Adiciona o usuário do SAP Gateway a variável",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "w_get_odata_auth_key",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "ODATA_USER",
+							"value": {
+								"value": "@json(activity('w_get_odata_auth_key').output.value).user",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "l_count",
+						"description": "Obtém o total de registros ",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "set_ver_odata_host",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "set_var_odata_user",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:06:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "DS_HTTP_SAP_ENTITY_TOTAL_RECORD",
+								"type": "DatasetReference",
+								"parameters": {
+									"SAP_GW_HOST": {
+										"value": "@variables('ODATA_HOST')",
+										"type": "Expression"
+									},
+									"SAP_GW_USER": {
+										"value": "@variables('ODATA_USER')",
+										"type": "Expression"
+									},
+									"SAP_ODATA_SRV": {
+										"value": "@pipeline().parameters.SAP_ODATA_SRV",
+										"type": "Expression"
+									},
+									"SAP_ENTITY": {
+										"value": "@pipeline().parameters.SAP_ENTITY_NAME",
+										"type": "Expression"
+									},
+									"QUERY": {
+										"value": "@if(empty(pipeline().parameters.FILTER), '', concat('?$filter=', pipeline().parameters.FILTER)) ",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					},
+					{
+						"name": "ForEachODataBatch",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "l_count",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@range(0, add(div(int(activity('l_count').output.firstRow.Prop_0), pipeline().parameters.BATCHSIZE),1))",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "cd_odata_sap_copy",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "ODataSource",
+											"query": {
+												"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item()), pipeline().parameters.BATCHSIZE)), if(empty(pipeline().parameters.FILTER), '', concat('&$filter=',pipeline().parameters.FILTER)), if(empty(pipeline().parameters.SELECT), '', concat('&$select=',pipeline().parameters.SELECT)))",
+												"type": "Expression"
+											},
+											"httpRequestTimeout": "00:05:00"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings",
+												"copyBehavior": "MergeFiles"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": true,
+										"stagingSettings": {
+											"linkedServiceName": {
+												"referenceName": "LS_ADLS_RAMADOANALYTICSDATA",
+												"type": "LinkedServiceReference"
+											},
+											"path": {
+												"value": "@{concat('staging/',pipeline().parameters.OUTPUT_PATH, '/', pipeline().parameters.SAP_ENTITY_NAME)}",
+												"type": "Expression"
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DS_ODATA_SAP",
+											"type": "DatasetReference",
+											"parameters": {
+												"SAP_GW_HOST": {
+													"value": "@variables('ODATA_HOST')",
+													"type": "Expression"
+												},
+												"SAP_GW_USER": {
+													"value": "@variables('ODATA_USER')",
+													"type": "Expression"
+												},
+												"SAP_ODATA_SRV": {
+													"value": "@pipeline().parameters.SAP_ODATA_SRV",
+													"type": "Expression"
+												},
+												"SAP_ENTITY": {
+													"value": "@pipeline().parameters.SAP_ENTITY_NAME",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DS_ADLS_RAW_SAP",
+											"type": "DatasetReference",
+											"parameters": {
+												"PATH_TO_ENTITY": {
+													"value": "@{concat(pipeline().parameters.OUTPUT_PATH, '/', pipeline().parameters.SAP_ENTITY_NAME)}",
+													"type": "Expression"
+												},
+												"COMPRESS_TYPE": "snappy"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"SAP_ODATA_AUTH_KEY": {
+						"type": "string"
+					},
+					"SAP_ODATA_SRV": {
+						"type": "string"
+					},
+					"SAP_ENTITY_NAME": {
+						"type": "string"
+					},
+					"OUTPUT_PATH": {
+						"type": "string"
+					},
+					"SAP_ODATA_FILTERS": {
+						"type": "string"
+					},
+					"BATCHSIZE": {
+						"type": "int"
+					},
+					"SELECT": {
+						"type": "string"
+					},
+					"FILTER": {
+						"type": "string"
+					},
+					"WATERMARK": {
+						"type": "string"
+					},
+					"WATERMARK_FIELD": {
+						"type": "string"
 					}
 				},
 				"variables": {
@@ -838,42 +1164,126 @@
 							"isSequential": false,
 							"activities": [
 								{
-									"name": "ep_sap_ingestion",
-									"type": "ExecutePipeline",
+									"name": "sw_delta",
+									"type": "Switch",
 									"dependsOn": [],
 									"userProperties": [],
 									"typeProperties": {
-										"pipeline": {
-											"referenceName": "PL_COPY_ODATA",
-											"type": "PipelineReference"
+										"on": {
+											"value": "@item().ExtractionType",
+											"type": "Expression"
 										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"SAP_ODATA_AUTH_KEY": {
-												"value": "@item().ODataServiceAuthKey",
-												"type": "Expression"
-											},
-											"SAP_ODATA_SRV": {
-												"value": "@item().PartitionKey",
-												"type": "Expression"
-											},
-											"SAP_ENTITY_NAME": {
-												"value": "@item().RowKey",
-												"type": "Expression"
-											},
-											"OUTPUT_PATH": {
-												"value": "@item().OutputPath",
-												"type": "Expression"
-											},
-											"SAP_ODATA_FILTERS": {
-												"value": "@item().Filter",
-												"type": "Expression"
-											},
-											"BATCHSIZE": {
-												"value": "@item().BatchSize",
-												"type": "Expression"
+										"cases": [
+											{
+												"value": "Delta",
+												"activities": [
+													{
+														"name": "ep_sap_delta_ingestion_copy",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "PL_COPY_ODATA_DELTA",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": true,
+															"parameters": {
+																"SAP_ODATA_AUTH_KEY": {
+																	"value": "@item().ODataServiceAuthKey",
+																	"type": "Expression"
+																},
+																"SAP_ODATA_SRV": {
+																	"value": "@item().PartitionKey",
+																	"type": "Expression"
+																},
+																"SAP_ENTITY_NAME": {
+																	"value": "@item().RowKey",
+																	"type": "Expression"
+																},
+																"OUTPUT_PATH": {
+																	"value": "@item().OutputPath",
+																	"type": "Expression"
+																},
+																"SAP_ODATA_FILTERS": {
+																	"value": "@item().Filter",
+																	"type": "Expression"
+																},
+																"BATCHSIZE": {
+																	"value": "@item().BatchSize",
+																	"type": "Expression"
+																},
+																"SELECT": {
+																	"value": "@item().Select",
+																	"type": "Expression"
+																},
+																"FILTER": {
+																	"value": "@item().Filter",
+																	"type": "Expression"
+																},
+																"WATERMARK": {
+																	"value": "@item().Watermark",
+																	"type": "Expression"
+																},
+																"WATERMARK_FIELD": {
+																	"value": "@item().WatermarkField",
+																	"type": "Expression"
+																}
+															}
+														}
+													}
+												]
 											}
-										}
+										],
+										"defaultActivities": [
+											{
+												"name": "ep_sap_ingestion",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "PL_COPY_ODATA",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"SAP_ODATA_AUTH_KEY": {
+															"value": "@item().ODataServiceAuthKey",
+															"type": "Expression"
+														},
+														"SAP_ODATA_SRV": {
+															"value": "@item().PartitionKey",
+															"type": "Expression"
+														},
+														"SAP_ENTITY_NAME": {
+															"value": "@item().RowKey",
+															"type": "Expression"
+														},
+														"OUTPUT_PATH": {
+															"value": "@item().OutputPath",
+															"type": "Expression"
+														},
+														"SAP_ODATA_FILTERS": {
+															"value": "@item().Filter",
+															"type": "Expression"
+														},
+														"BATCHSIZE": {
+															"value": "@item().BatchSize",
+															"type": "Expression"
+														},
+														"SELECT": {
+															"value": "@item().Select",
+															"type": "Expression"
+														},
+														"FILTER": {
+															"value": "@item().Filter",
+															"type": "Expression"
+														}
+													}
+												}
+											}
+										]
 									}
 								}
 							]
@@ -888,7 +1298,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_ATBL_WATERMARK')]",
-				"[concat(variables('factoryId'), '/pipelines/PL_COPY_ODATA')]"
+				"[concat(variables('factoryId'), '/pipelines/PL_COPY_ODATA')]",
+				"[concat(variables('factoryId'), '/pipelines/PL_COPY_ODATA_DELTA')]"
 			]
 		}
 	]
