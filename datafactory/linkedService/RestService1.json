@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "http://187.106.32.250:5000/",
+			"url": "http://host.docker.internal:5000/",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
 		},
