@@ -450,6 +450,12 @@
 			},
 			"WATERMARK_FIELD": {
 				"type": "string"
+			},
+			"WATERMARK_FIELD_TYPE": {
+				"type": "string"
+			},
+			"WATERMARK_FIELD_TYPE_FORMAT": {
+				"type": "string"
 			}
 		},
 		"variables": {
