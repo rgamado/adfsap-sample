@@ -361,6 +361,26 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_ATBL_CTRLPROC')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ATBL_RAMADOANALYTICSDATA",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureTable",
+				"schema": [],
+				"typeProperties": {
+					"tableName": "watermarktable"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ATBL_RAMADOANALYTICSDATA')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_ATBL_WATERMARK')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -490,26 +510,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_ODATA_SAP')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_ATBL_CTRLPROC')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_ATBL_RAMADOANALYTICSDATA",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureTable",
-				"schema": [],
-				"typeProperties": {
-					"tableName": "watermarktable"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_ATBL_RAMADOANALYTICSDATA')]"
 			]
 		},
 		{
@@ -805,8 +805,7 @@
 				"[concat(variables('factoryId'), '/datasets/DS_HTTP_SAP_ENTITY_TOTAL_RECORD')]",
 				"[concat(variables('factoryId'), '/credentials/uai-ramadoanalytics-credential')]",
 				"[concat(variables('factoryId'), '/datasets/DS_ODATA_SAP')]",
-				"[concat(variables('factoryId'), '/datasets/DS_ADLS_RAW_SAP')]",
-				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_RAMADOANALYTICSDATA')]"
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_RAW_SAP')]"
 			]
 		},
 		{
@@ -951,7 +950,7 @@
 										"type": "Expression"
 									},
 									"QUERY": {
-										"value": "@if(empty(pipeline().parameters.FILTER), concat('?$filter=', if(empty(pipeline().parameters.WATERMARK), '', concat(pipeline().parameters.WATERMARK_FIELD, ' gt datetimeoffset''', formatDateTime(pipeline().parameters.WATERMARK, 'yyyy-MM-ddThh:ss:sZ'), ''' and ')), pipeline().parameters.WATERMARK_FIELD, ' le datetimeoffset''', formatDateTime(variables('V_WATERMARK'), 'yyyy-MM-ddThh:ss:sZ'),''''), concat('?$filter=', pipeline().parameters.FILTER, if(empty(pipeline().parameters.WATERMARK), '', concat(' and ', pipeline().parameters.WATERMARK_FIELD, ' gt datetimeoffset''', formatDateTime(pipeline().parameters.WATERMARK, 'yyyy-MM-ddThh:ss:sZ'))), ''' and ', pipeline().parameters.WATERMARK_FIELD, ' le datetimeoffset''', formatDateTime(variables('V_WATERMARK'), 'yyyy-MM-ddThh:ss:sZ'),''''))",
+										"value": "@if(empty(pipeline().parameters.FILTER), concat('?$filter=', if(empty(pipeline().parameters.WATERMARK), '', concat(pipeline().parameters.WATERMARK_FIELD, ' gt ', pipeline().parameters.WATERMARK_FIELD_TYPE, '''', formatDateTime(pipeline().parameters.WATERMARK, pipeline().parameters.WATERMARK_FIELD_TYPE_FORMAT), ''' and ')), pipeline().parameters.WATERMARK_FIELD, ' le ', pipeline().parameters.WATERMARK_FIELD_TYPE, '''', formatDateTime(variables('V_WATERMARK'), pipeline().parameters.WATERMARK_FIELD_TYPE_FORMAT),''''), concat('?$filter=', pipeline().parameters.FILTER, if(empty(pipeline().parameters.WATERMARK), '', concat(' and ', pipeline().parameters.WATERMARK_FIELD, ' gt ', pipeline().parameters.WATERMARK_FIELD_TYPE, '''', formatDateTime(pipeline().parameters.WATERMARK, pipeline().parameters.WATERMARK_FIELD_TYPE_FORMAT))), ''' and ', pipeline().parameters.WATERMARK_FIELD, ' le ', pipeline().parameters.WATERMARK_FIELD_TYPE, '''', formatDateTime(variables('V_WATERMARK'), pipeline().parameters.WATERMARK_FIELD_TYPE_FORMAT),''''))",
 										"type": "Expression"
 									}
 								}
@@ -992,7 +991,7 @@
 										"source": {
 											"type": "ODataSource",
 											"query": {
-												"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item()), pipeline().parameters.BATCHSIZE)), if(empty(pipeline().parameters.FILTER), concat('&$filter=', if(empty(pipeline().parameters.WATERMARK), '', concat(pipeline().parameters.WATERMARK_FIELD, ' gt datetimeoffset''', formatDateTime(pipeline().parameters.WATERMARK, 'yyyy-MM-ddThh:ss:sZ'),'''', ' and ')), pipeline().parameters.WATERMARK_FIELD, ' le datetimeoffset''', formatDateTime(variables('V_WATERMARK'), 'yyyy-MM-ddThh:ss:sZ'),''''), concat('&$filter=', pipeline().parameters.FILTER, if(empty(pipeline().parameters.WATERMARK), '', concat(' and ', pipeline().parameters.WATERMARK_FIELD, ' gt datetimeoffset''', formatDateTime(pipeline().parameters.WATERMARK, 'yyyy-MM-ddThh:ss:sZ'),'''')), ' and ', pipeline().parameters.WATERMARK_FIELD, ' le datetimeoffset''', formatDateTime(variables('V_WATERMARK'), 'yyyy-MM-ddThh:ss:sZ'),'''')), if(empty(pipeline().parameters.SELECT), '', concat('&$select=',pipeline().parameters.SELECT)))",
+												"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item()), pipeline().parameters.BATCHSIZE)), if(empty(pipeline().parameters.FILTER), concat('&$filter=', if(empty(pipeline().parameters.WATERMARK), '', concat(pipeline().parameters.WATERMARK_FIELD, ' gt ', pipeline().parameters.WATERMARK_FIELD_TYPE, '''', formatDateTime(pipeline().parameters.WATERMARK, pipeline().parameters.WATERMARK_FIELD_TYPE_FORMAT),'''', ' and ')), pipeline().parameters.WATERMARK_FIELD, ' le ', pipeline().parameters.WATERMARK_FIELD_TYPE, '''', formatDateTime(variables('V_WATERMARK'), pipeline().parameters.WATERMARK_FIELD_TYPE_FORMAT),''''), concat('&$filter=', pipeline().parameters.FILTER, if(empty(pipeline().parameters.WATERMARK), '', concat(' and ', pipeline().parameters.WATERMARK_FIELD, ' gt ', pipeline().parameters.WATERMARK_FIELD_TYPE, '''', formatDateTime(pipeline().parameters.WATERMARK, pipeline().parameters.WATERMARK_FIELD_TYPE_FORMAT),'''')), ' and ', pipeline().parameters.WATERMARK_FIELD, ' le ', pipeline().parameters.WATERMARK_FIELD_TYPE, '''', formatDateTime(variables('V_WATERMARK'), pipeline().parameters.WATERMARK_FIELD_TYPE_FORMAT),'''')), if(empty(pipeline().parameters.SELECT), '', concat('&$select=',pipeline().parameters.SELECT)))",
 												"type": "Expression"
 											},
 											"httpRequestTimeout": "00:05:00"
@@ -1270,6 +1269,12 @@
 					},
 					"WATERMARK_FIELD": {
 						"type": "string"
+					},
+					"WATERMARK_FIELD_TYPE": {
+						"type": "string"
+					},
+					"WATERMARK_FIELD_TYPE_FORMAT": {
+						"type": "string"
 					}
 				},
 				"variables": {
@@ -1292,8 +1297,7 @@
 				"[concat(variables('factoryId'), '/datasets/DS_ATBL_CTRLPROC')]",
 				"[concat(variables('factoryId'), '/datasets/DS_ATBL_WATERMARK')]",
 				"[concat(variables('factoryId'), '/credentials/uai-ramadoanalytics-credential')]",
-				"[concat(variables('factoryId'), '/datasets/DS_ADLS_RAW_SAP')]",
-				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_RAMADOANALYTICSDATA')]"
+				"[concat(variables('factoryId'), '/datasets/DS_ADLS_RAW_SAP')]"
 			]
 		},
 		{
@@ -1411,6 +1415,14 @@
 																},
 																"WATERMARK_FIELD": {
 																	"value": "@item().WatermarkField",
+																	"type": "Expression"
+																},
+																"WATERMARK_FIELD_TYPE": {
+																	"value": "@item().WatermarkFieldDataType",
+																	"type": "Expression"
+																},
+																"WATERMARK_FIELD_TYPE_FORMAT": {
+																	"value": "@item().WatermarkFieldDataTypeFormat",
 																	"type": "Expression"
 																}
 															}
