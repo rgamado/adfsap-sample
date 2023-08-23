@@ -199,17 +199,7 @@
 										"type": "ParquetWriteSettings"
 									}
 								},
-								"enableStaging": true,
-								"stagingSettings": {
-									"linkedServiceName": {
-										"referenceName": "LS_ADLS_RAMADOANALYTICSDATA",
-										"type": "LinkedServiceReference"
-									},
-									"path": {
-										"value": "@{concat('staging/',pipeline().parameters.OUTPUT_PATH, '/', pipeline().parameters.SAP_ENTITY_NAME)}",
-										"type": "Expression"
-									}
-								}
+								"enableStaging": false
 							},
 							"inputs": [
 								{
