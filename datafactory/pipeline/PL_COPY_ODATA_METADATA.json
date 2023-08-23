@@ -111,6 +111,14 @@
 														"WATERMARK_FIELD": {
 															"value": "@item().WatermarkField",
 															"type": "Expression"
+														},
+														"WATERMARK_FIELD_TYPE": {
+															"value": "@item().WatermarkFieldDataType",
+															"type": "Expression"
+														},
+														"WATERMARK_FIELD_TYPE_FORMAT": {
+															"value": "@item().WatermarkFieldDataTypeFormat",
+															"type": "Expression"
 														}
 													}
 												}
