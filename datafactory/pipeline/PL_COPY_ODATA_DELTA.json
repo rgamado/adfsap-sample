@@ -331,6 +331,7 @@
 			},
 			{
 				"name": "cd_update_watermark",
+				"description": "Atualiza o campo watermark na tabela de controle do processamento com o maior valor encontrado na cds view processada.",
 				"type": "Copy",
 				"dependsOn": [
 					{
