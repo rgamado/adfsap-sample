@@ -178,7 +178,7 @@
 								"source": {
 									"type": "ODataSource",
 									"query": {
-										"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item()), pipeline().parameters.BATCHSIZE)), if(empty(pipeline().parameters.FILTER), '', concat('&$filter=',pipeline().parameters.FILTER)), if(empty(pipeline().parameters.SELECT), '', concat('&$select=',pipeline().parameters.SELECT)))",
+										"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item()), pipeline().parameters.BATCHSIZE)), if(empty(pipeline().parameters.FILTER), concat('&$filter=', if(empty(pipeline().parameters.WATERMARK), '', concat(pipeline().parameters.WATERMARK_FIELD, ' gt datetimeoffset''', formatDateTime(pipeline().parameters.WATERMARK, 'yyyy-MM-ddThh:ss:sZ'),'''', ' and ')), pipeline().parameters.WATERMARK_FIELD, ' le datetimeoffset''', formatDateTime(variables('V_WATERMARK'), 'yyyy-MM-ddThh:ss:sZ'),''''), concat('&$filter=', pipeline().parameters.FILTER, if(empty(pipeline().parameters.WATERMARK), '', concat(' and ', pipeline().parameters.WATERMARK_FIELD, ' gt datetimeoffset''', formatDateTime(pipeline().parameters.WATERMARK, 'yyyy-MM-ddThh:ss:sZ'),'''')), ' and ', pipeline().parameters.WATERMARK_FIELD, ' le datetimeoffset''', formatDateTime(variables('V_WATERMARK'), 'yyyy-MM-ddThh:ss:sZ'),'''')), if(empty(pipeline().parameters.SELECT), '', concat('&$select=',pipeline().parameters.SELECT)))",
 										"type": "Expression"
 									},
 									"httpRequestTimeout": "00:05:00"
