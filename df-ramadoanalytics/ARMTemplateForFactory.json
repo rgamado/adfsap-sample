@@ -127,7 +127,7 @@
 						}
 					},
 					{
-						"name": "set_ver_odata_host",
+						"name": "set_var_odata_host",
 						"description": "Adiciona o host do SAP Gateway a variável",
 						"type": "SetVariable",
 						"dependsOn": [
@@ -182,7 +182,7 @@
 						"type": "Lookup",
 						"dependsOn": [
 							{
-								"activity": "set_ver_odata_host",
+								"activity": "set_var_odata_host",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -284,23 +284,13 @@
 											"type": "ParquetSink",
 											"storeSettings": {
 												"type": "AzureBlobFSWriteSettings",
-												"copyBehavior": "MergeFiles"
+												"copyBehavior": "PreserveHierarchy"
 											},
 											"formatSettings": {
 												"type": "ParquetWriteSettings"
 											}
 										},
-										"enableStaging": true,
-										"stagingSettings": {
-											"linkedServiceName": {
-												"referenceName": "LS_ADLS_RAMADOANALYTICSDATA",
-												"type": "LinkedServiceReference"
-											},
-											"path": {
-												"value": "@{concat('staging/',pipeline().parameters.OUTPUT_PATH, '/', pipeline().parameters.SAP_ENTITY_NAME)}",
-												"type": "Expression"
-											}
-										}
+										"enableStaging": false
 									},
 									"inputs": [
 										{
@@ -434,7 +424,7 @@
 						}
 					},
 					{
-						"name": "set_ver_odata_host",
+						"name": "set_var_odata_host",
 						"description": "Adiciona o host do SAP Gateway a variável",
 						"type": "SetVariable",
 						"dependsOn": [
@@ -489,13 +479,7 @@
 						"type": "Lookup",
 						"dependsOn": [
 							{
-								"activity": "set_ver_odata_host",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "set_var_odata_user",
+								"activity": "set_var_watermark",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -541,7 +525,7 @@
 										"type": "Expression"
 									},
 									"QUERY": {
-										"value": "@if(empty(pipeline().parameters.FILTER), '', concat('?$filter=', pipeline().parameters.FILTER)) ",
+										"value": "@if(empty(pipeline().parameters.FILTER), concat('?$filter=', if(empty(pipeline().parameters.WATERMARK), '', concat(pipeline().parameters.WATERMARK_FIELD, ' gt datetimeoffset''', formatDateTime(pipeline().parameters.WATERMARK, 'yyyy-MM-ddThh:ss:sZ'), ''' and ')), pipeline().parameters.WATERMARK_FIELD, ' le datetimeoffset''', formatDateTime(variables('V_WATERMARK'), 'yyyy-MM-ddThh:ss:sZ'),''''), concat('?$filter=', pipeline().parameters.FILTER, if(empty(pipeline().parameters.WATERMARK), '', concat(' and ', pipeline().parameters.WATERMARK_FIELD, ' gt datetimeoffset''', formatDateTime(pipeline().parameters.WATERMARK, 'yyyy-MM-ddThh:ss:sZ'))), ''' and ', pipeline().parameters.WATERMARK_FIELD, ' le datetimeoffset''', formatDateTime(variables('V_WATERMARK'), 'yyyy-MM-ddThh:ss:sZ'),''''))",
 										"type": "Expression"
 									}
 								}
@@ -582,7 +566,7 @@
 										"source": {
 											"type": "ODataSource",
 											"query": {
-												"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item()), pipeline().parameters.BATCHSIZE)), if(empty(pipeline().parameters.FILTER), '', concat('&$filter=',pipeline().parameters.FILTER)), if(empty(pipeline().parameters.SELECT), '', concat('&$select=',pipeline().parameters.SELECT)))",
+												"value": "@concat('$top=',string(pipeline().parameters.BATCHSIZE), '&$skip=',string(mul(int(item()), pipeline().parameters.BATCHSIZE)), if(empty(pipeline().parameters.FILTER), concat('&$filter=', if(empty(pipeline().parameters.WATERMARK), '', concat(pipeline().parameters.WATERMARK_FIELD, ' gt datetimeoffset''', formatDateTime(pipeline().parameters.WATERMARK, 'yyyy-MM-ddThh:ss:sZ'),'''', ' and ')), pipeline().parameters.WATERMARK_FIELD, ' le datetimeoffset''', formatDateTime(variables('V_WATERMARK'), 'yyyy-MM-ddThh:ss:sZ'),''''), concat('&$filter=', pipeline().parameters.FILTER, if(empty(pipeline().parameters.WATERMARK), '', concat(' and ', pipeline().parameters.WATERMARK_FIELD, ' gt datetimeoffset''', formatDateTime(pipeline().parameters.WATERMARK, 'yyyy-MM-ddThh:ss:sZ'),'''')), ' and ', pipeline().parameters.WATERMARK_FIELD, ' le datetimeoffset''', formatDateTime(variables('V_WATERMARK'), 'yyyy-MM-ddThh:ss:sZ'),'''')), if(empty(pipeline().parameters.SELECT), '', concat('&$select=',pipeline().parameters.SELECT)))",
 												"type": "Expression"
 											},
 											"httpRequestTimeout": "00:05:00"
@@ -591,23 +575,13 @@
 											"type": "ParquetSink",
 											"storeSettings": {
 												"type": "AzureBlobFSWriteSettings",
-												"copyBehavior": "MergeFiles"
+												"copyBehavior": "PreserveHierarchy"
 											},
 											"formatSettings": {
 												"type": "ParquetWriteSettings"
 											}
 										},
-										"enableStaging": true,
-										"stagingSettings": {
-											"linkedServiceName": {
-												"referenceName": "LS_ADLS_RAMADOANALYTICSDATA",
-												"type": "LinkedServiceReference"
-											},
-											"path": {
-												"value": "@{concat('staging/',pipeline().parameters.OUTPUT_PATH, '/', pipeline().parameters.SAP_ENTITY_NAME)}",
-												"type": "Expression"
-											}
-										}
+										"enableStaging": false
 									},
 									"inputs": [
 										{
@@ -649,6 +623,191 @@
 								}
 							]
 						}
+					},
+					{
+						"name": "l_high_watermark",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "set_var_odata_host",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "set_var_odata_user",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:06:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ODataSource",
+								"query": {
+									"value": "@if(empty(pipeline().parameters.FILTER), concat('?$select=', pipeline().parameters.WATERMARK_FIELD, '&$top=1&$orderby=', pipeline().parameters.WATERMARK_FIELD, ' desc'), concat('?$filter=', pipeline().parameters.FILTER, '&$select=', pipeline().parameters.WATERMARK_FIELD, '&$top=1&$orderby=', pipeline().parameters.WATERMARK_FIELD, ' desc'))",
+									"type": "Expression"
+								},
+								"httpRequestTimeout": "00:05:00"
+							},
+							"dataset": {
+								"referenceName": "DS_ODATA_SAP",
+								"type": "DatasetReference",
+								"parameters": {
+									"SAP_GW_HOST": {
+										"value": "@variables('ODATA_HOST')",
+										"type": "Expression"
+									},
+									"SAP_GW_USER": {
+										"value": "@variables('ODATA_USER')",
+										"type": "Expression"
+									},
+									"SAP_ODATA_SRV": {
+										"value": "@pipeline().parameters.SAP_ODATA_SRV",
+										"type": "Expression"
+									},
+									"SAP_ENTITY": {
+										"value": "@pipeline().parameters.SAP_ENTITY_NAME",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					},
+					{
+						"name": "set_var_watermark",
+						"description": "Armazena o maior valor do campo definido para watermark no momento do processamento para evitar perda de dados em processamento futuros",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "l_high_watermark",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_WATERMARK",
+							"value": {
+								"value": "@activity('l_high_watermark').output.firstRow[pipeline().parameters.WATERMARK_FIELD]",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "cd_update_watermark",
+						"description": "Atualiza o campo watermark na tabela de controle do processamento com o maior valor encontrado na cds view processada.",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ForEachODataBatch",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:05:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureTableSource",
+								"additionalColumns": [
+									{
+										"name": "HighWatermark",
+										"value": {
+											"value": "@variables('V_WATERMARK')",
+											"type": "Expression"
+										}
+									}
+								],
+								"azureTableSourceQuery": {
+									"value": "@concat('PartitionKey eq ''', pipeline().parameters.SAP_ODATA_SRV, ''' and RowKey eq ''', pipeline().parameters.SAP_ENTITY_NAME, '''')",
+									"type": "Expression"
+								},
+								"azureTableSourceIgnoreTableNotFound": false
+							},
+							"sink": {
+								"type": "AzureTableSink",
+								"azureTableInsertType": "merge",
+								"azureTablePartitionKeyName": "PartitionKey",
+								"azureTableRowKeyName": "RowKey",
+								"writeBatchSize": 10000
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "PartitionKey",
+											"type": "String"
+										},
+										"sink": {
+											"name": "PartitionKey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "RowKey",
+											"type": "String"
+										},
+										"sink": {
+											"name": "RowKey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "HighWatermark",
+											"type": "String"
+										},
+										"sink": {
+											"name": "Watermark",
+											"type": "String"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_ATBL_CTRLPROC",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_ATBL_WATERMARK",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
 					}
 				],
 				"policy": {
@@ -693,6 +852,9 @@
 					},
 					"ODATA_USER": {
 						"type": "String"
+					},
+					"V_WATERMARK": {
+						"type": "String"
 					}
 				},
 				"annotations": []
@@ -700,8 +862,10 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/AzServicesIntegrationRuntime')]",
 				"[concat(variables('factoryId'), '/datasets/DS_HTTP_SAP_ENTITY_TOTAL_RECORD')]",
-				"[concat(variables('factoryId'), '/credentials/uai-ramadoanalytics-credential')]",
 				"[concat(variables('factoryId'), '/datasets/DS_ODATA_SAP')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ATBL_CTRLPROC')]",
+				"[concat(variables('factoryId'), '/datasets/DS_ATBL_WATERMARK')]",
+				"[concat(variables('factoryId'), '/credentials/uai-ramadoanalytics-credential')]",
 				"[concat(variables('factoryId'), '/datasets/DS_ADLS_RAW_SAP')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_RAMADOANALYTICSDATA')]"
 			]
@@ -1300,6 +1464,26 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ATBL_CTRLPROC')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ATBL_RAMADOANALYTICSDATA",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureTable",
+				"schema": [],
+				"typeProperties": {
+					"tableName": "watermarktable"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ATBL_RAMADOANALYTICSDATA')]"
 			]
 		}
 	]
