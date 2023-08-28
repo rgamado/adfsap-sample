@@ -46,20 +46,6 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "filesystem" {
 }
 
 resource "azurerm_storage_table" "watermark" {
-  name                 = "watermarktable"
+  name                 = "ctrlproc"
   storage_account_name = azurerm_storage_account.datalake.name
-}
-
-resource "azurerm_private_endpoint" "datalake" {
-  name                = "pe-datalake-${var.default_name}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  subnet_id           = var.private_endpoint_subnet_storage_id
-
-  private_service_connection {
-    name                           = "psc-datalake-${var.default_name}"
-    is_manual_connection           = false
-    private_connection_resource_id = azurerm_storage_account.datalake.id
-    subresource_names              = ["dfs", "blob"]
-  }
 }
