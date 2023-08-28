@@ -1,5 +1,5 @@
 {
-	"name": "LS_ODATA_SAP",
+	"name": "LS_HTTP_SAP",
 	"properties": {
 		"parameters": {
 			"SAP_GW_HOST": {
@@ -13,9 +13,10 @@
 			}
 		},
 		"annotations": [],
-		"type": "OData",
+		"type": "HttpServer",
 		"typeProperties": {
 			"url": "@{concat(linkedService().SAP_GW_HOST, linkedService().SAP_ODATA_SRV, '/')}",
+			"enableServerCertificateValidation": true,
 			"authenticationType": "Basic",
 			"userName": "@{linkedService().SAP_GW_USER}",
 			"password": {

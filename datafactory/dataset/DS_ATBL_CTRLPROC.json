@@ -1,0 +1,15 @@
+{
+	"name": "DS_ATBL_CTRLPROC",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ATBL_RAMADOANALYTICSDATA",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureTable",
+		"schema": [],
+		"typeProperties": {
+			"tableName": "watermarktable"
+		}
+	}
+}

@@ -1,0 +1,35 @@
+{
+	"name": "DS_ADLS_RAW_SAP",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_RAMADOANALYTICSDATA",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"PATH_TO_ENTITY": {
+				"type": "string"
+			},
+			"COMPRESS_TYPE": {
+				"type": "string",
+				"defaultValue": "snappy"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().PATH_TO_ENTITY",
+					"type": "Expression"
+				},
+				"fileSystem": "raw"
+			},
+			"compressionCodec": {
+				"value": "@dataset().COMPRESS_TYPE",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}

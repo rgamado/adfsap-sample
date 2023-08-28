@@ -1,0 +1,56 @@
+{
+	"name": "DS_HTTP_SAP_ENTITY_TOTAL_RECORD",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_HTTP_SAP",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"SAP_GW_HOST": {
+					"value": "@dataset().SAP_GW_HOST",
+					"type": "Expression"
+				},
+				"SAP_ODATA_SRV": {
+					"value": "@dataset().SAP_ODATA_SRV",
+					"type": "Expression"
+				},
+				"SAP_GW_USER": {
+					"value": "@dataset().SAP_GW_USER",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"SAP_GW_HOST": {
+				"type": "string"
+			},
+			"SAP_GW_USER": {
+				"type": "string"
+			},
+			"SAP_ODATA_SRV": {
+				"type": "string"
+			},
+			"SAP_ENTITY": {
+				"type": "string"
+			},
+			"QUERY": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@concat(dataset().SAP_ENTITY, '/$count', dataset().QUERY)",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": false,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
