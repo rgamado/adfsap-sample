@@ -1,0 +1,38 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ODataSource",
+						"httpRequestTimeout": "00:05:00"
+					},
+					"dataset": {
+						"referenceName": "DS_ODATA_SAP",
+						"type": "DatasetReference",
+						"parameters": {
+							"SAP_GW_HOST": "http://191.234.192.107:8000/sap/opu/odata/sap/",
+							"SAP_GW_USER": "DEVELOPER",
+							"SAP_ODATA_SRV": "EPM_REF_APPS_SHOP_SRV",
+							"SAP_ENTITY": "Reviews"
+						}
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"annotations": []
+	}
+}
