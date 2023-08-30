@@ -28,7 +28,7 @@
 			}
 		},
 		"connectVia": {
-			"referenceName": "AzServicesIntegrationRuntime",
+			"referenceName": "AcerIntegrationRuntime",
 			"type": "IntegrationRuntimeReference"
 		}
 	}
