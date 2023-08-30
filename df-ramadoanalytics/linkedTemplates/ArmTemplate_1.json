@@ -1,0 +1,210 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "df-ramadoanalytics"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_COPY_ODATA_METADATA')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "l_metadata",
+						"description": "Lista todas as CDS Views e os parâmetros de processamento.",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:05:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureTableSource",
+								"azureTableSourceIgnoreTableNotFound": false
+							},
+							"dataset": {
+								"referenceName": "DS_ATBL_WATERMARK",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "fe_metadata",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "l_metadata",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('l_metadata').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "sw_delta",
+									"type": "Switch",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"on": {
+											"value": "@item().ExtractionType",
+											"type": "Expression"
+										},
+										"cases": [
+											{
+												"value": "Delta",
+												"activities": [
+													{
+														"name": "ep_sap_delta_ingestion_copy",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "PL_COPY_ODATA_DELTA",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": true,
+															"parameters": {
+																"SAP_ODATA_AUTH_KEY": {
+																	"value": "@item().ODataServiceAuthKey",
+																	"type": "Expression"
+																},
+																"SAP_ODATA_SRV": {
+																	"value": "@item().PartitionKey",
+																	"type": "Expression"
+																},
+																"SAP_ENTITY_NAME": {
+																	"value": "@item().RowKey",
+																	"type": "Expression"
+																},
+																"OUTPUT_PATH": {
+																	"value": "@item().OutputPath",
+																	"type": "Expression"
+																},
+																"SAP_ODATA_FILTERS": {
+																	"value": "@item().Filter",
+																	"type": "Expression"
+																},
+																"BATCHSIZE": {
+																	"value": "@item().BatchSize",
+																	"type": "Expression"
+																},
+																"SELECT": {
+																	"value": "@item().Select",
+																	"type": "Expression"
+																},
+																"FILTER": {
+																	"value": "@item().Filter",
+																	"type": "Expression"
+																},
+																"WATERMARK": {
+																	"value": "@item().Watermark",
+																	"type": "Expression"
+																},
+																"WATERMARK_FIELD": {
+																	"value": "@item().WatermarkField",
+																	"type": "Expression"
+																},
+																"WATERMARK_FIELD_TYPE": {
+																	"value": "@item().WatermarkFieldDataType",
+																	"type": "Expression"
+																},
+																"WATERMARK_FIELD_TYPE_FORMAT": {
+																	"value": "@item().WatermarkFieldDataTypeFormat",
+																	"type": "Expression"
+																}
+															}
+														}
+													}
+												]
+											}
+										],
+										"defaultActivities": [
+											{
+												"name": "ep_sap_ingestion",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "PL_COPY_ODATA",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"SAP_ODATA_AUTH_KEY": {
+															"value": "@item().ODataServiceAuthKey",
+															"type": "Expression"
+														},
+														"SAP_ODATA_SRV": {
+															"value": "@item().PartitionKey",
+															"type": "Expression"
+														},
+														"SAP_ENTITY_NAME": {
+															"value": "@item().RowKey",
+															"type": "Expression"
+														},
+														"OUTPUT_PATH": {
+															"value": "@item().OutputPath",
+															"type": "Expression"
+														},
+														"SAP_ODATA_FILTERS": {
+															"value": "@item().Filter",
+															"type": "Expression"
+														},
+														"BATCHSIZE": {
+															"value": "@item().BatchSize",
+															"type": "Expression"
+														},
+														"SELECT": {
+															"value": "@item().Select",
+															"type": "Expression"
+														},
+														"FILTER": {
+															"value": "@item().Filter",
+															"type": "Expression"
+														}
+													}
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}
