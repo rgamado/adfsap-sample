@@ -5,8 +5,8 @@
 		"annotations": [],
 		"type": "Teradata",
 		"typeProperties": {
-			"connectionString": "dbcname=4.228.205.21;uid=dbc;charset=UTF8",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI5NWNkN2NkZC0zZWE0LTQ5YjgtYjExZi0xOWZkMTBlZDUzYTUiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"connectionString": "dbcname=4.228.205.21;uid=dbc;charset=UTF8;tmode=ANSI;encryptdata=ON;database=SAP",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJkMjlkOGE1NC02NmI4LTQ1NGEtOWI0MC1hMWM4Njk4MTcwZWQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "AcerIntegrationRuntime",
