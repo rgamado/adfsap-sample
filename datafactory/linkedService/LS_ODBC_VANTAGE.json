@@ -12,10 +12,6 @@
 			"authenticationType": "Basic",
 			"userName": "dbc",
 			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIwOTZkM2I2MS05M2U3LTQ1M2MtOWZjNS0zZDg2YmY0NDU2NDMiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
-		},
-		"connectVia": {
-			"referenceName": "AcerIntegrationRuntime",
-			"type": "IntegrationRuntimeReference"
 		}
 	}
 }

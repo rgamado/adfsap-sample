@@ -26,10 +26,6 @@
 				},
 				"secretName": "SAP-GATEWAY-PWD"
 			}
-		},
-		"connectVia": {
-			"referenceName": "AcerIntegrationRuntime",
-			"type": "IntegrationRuntimeReference"
 		}
 	}
 }

@@ -20,10 +20,6 @@
 						"value": "@{concat('https://kv-ramadoanalytics.vault.azure.net/secrets/', pipeline().parameters.SAP_ODATA_AUTH_KEY, '?api-version=7.0')}",
 						"type": "Expression"
 					},
-					"connectVia": {
-						"referenceName": "AzServicesIntegrationRuntime",
-						"type": "IntegrationRuntimeReference"
-					},
 					"method": "GET",
 					"authentication": {
 						"resource": "https://vault.azure.net",

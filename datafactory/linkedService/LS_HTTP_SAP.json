@@ -27,10 +27,6 @@
 				},
 				"secretName": "SAP-GATEWAY-PWD"
 			}
-		},
-		"connectVia": {
-			"referenceName": "AzServicesIntegrationRuntime",
-			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
