@@ -23,10 +23,6 @@
 					"method": "GET",
 					"authentication": {
 						"resource": "https://vault.azure.net",
-						"credential": {
-							"referenceName": "uai-ramadoanalytics-credential",
-							"type": "CredentialReference"
-						},
 						"type": "UserAssignedManagedIdentity"
 					}
 				}
